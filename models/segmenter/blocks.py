@@ -3,7 +3,7 @@ import tensorflow as tf
 from keras import layers
 
 
-def encode_block(inputs=None, n_filters=32, dropout_prob=0, max_pooling=True):
+def encode_block(inputs, n_filters, dropout_prob=0, max_pooling=True):
 
     conv = layers.Conv2D(n_filters, # Number of filters
                   3,   # Kernel size   
@@ -31,7 +31,7 @@ def encode_block(inputs=None, n_filters=32, dropout_prob=0, max_pooling=True):
     return next_layer, skip_connection
 
 
-def decode_block(expansive_input, contractive_input, n_filters=32):
+def decode_block(expansive_input, contractive_input, n_filters):
     
     up = layers.Conv2DTranspose(
                  n_filters,    # number of filters
