@@ -1,6 +1,8 @@
 ####### vitrual environment
 tumsc
 desktop.ini
+BRATS_data
+Kaggle_classify_data
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
