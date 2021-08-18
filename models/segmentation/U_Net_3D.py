@@ -1,9 +1,9 @@
 import numpy as np
 import tensorflow as tf
-import keras as layers
+from keras import layers
+from keras.models import Model
 
-# use keras's functional api to build convolutional model
-
+# use keras's functional api to build convolutional model for segmentation
 def unet_3D_model(input_size=(240, 240, 3), n_filters=64, n_classes=10):
     # encode blocks have two outputs: first one is the output 
     # and the second is for skip connection
@@ -27,7 +27,7 @@ def unet_3D_model(input_size=(240, 240, 3), n_filters=64, n_classes=10):
                     kernel_initializer='he_normal')(decode9)
     outputs = layers.Conv2D(n_classes, 1, padding='same')(conv)
 
-    model = tf.keras.Model(inputs=inputs, outputs=outputs)
+    model = Model(inputs=inputs, outputs=outputs)
 
     return model
 
