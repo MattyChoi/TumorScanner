@@ -2,7 +2,7 @@
 tumsc
 desktop.ini
 BRATS_data
-Kaggle_classify_data
+classify_data
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
