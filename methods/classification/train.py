@@ -23,15 +23,14 @@ def train(model, BATCH_SIZE=32, EPOCHS=50, IMG_SIZE=(150,150)):
     # data augmentation for training set
     train_datagen = ImageDataGenerator(
         rescale = 1./255,
+        # rotation_range=15,
+        # width_shift_range=0.1,
+        # height_shift_range=0.1,
         shear_range=0.1,
         zoom_range=0.1,
         horizontal_flip=True,
         # vertical_flip=True,
-        # rotation_range=15,
-        # width_shift_range=0.1,
-        # height_shift_range=0.1,
-        # shear_range=0.1,
-        # brightness_range=[0.5, 1.5]
+        # brightness_range=[0.5, 1.5],
     )
 
     # rescale validation testset
@@ -65,7 +64,7 @@ def train(model, BATCH_SIZE=32, EPOCHS=50, IMG_SIZE=(150,150)):
     #     json_file.write(model_json)
 
     # serialize weights to HDF5
-    model.save("cnn_model.h5")
+    model.save("../../models/cnn_model.h5")
     print("Saved model to disk")
 
 
@@ -78,4 +77,4 @@ if __name__ == "__main__":
     model = cnn()
     
     # train the model
-    train(model, BATCH_SIZE=32, EPOCHS=50, IMG_SIZE=(150,150))
+    train(model, BATCH_SIZE=32, EPOCHS=70, IMG_SIZE=(150,150))

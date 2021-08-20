@@ -1,7 +1,7 @@
 import streamlit as st
 from PIL import Image
 from keras.models import load_model
-import keras.preprocessing
+from keras.preprocessing.image import img_to_array, load_img
 import numpy as np
 import os
 
@@ -9,10 +9,10 @@ import os
 st.title("Tumor Scanner")
 
 uploaded_file = st.file_uploader("Pick a file")
-model = load_model(os.path.join(os.getcwd(), "methods", "classification", "cnn_model.h5"))
+model = load_model(os.path.join(os.getcwd(), "models", "cnn_model.h5"))
 
 if uploaded_file is not None:
-    img = Image.open(uploaded_file)
+    img = load_img(uploaded_file, target_size=(150, 150), color_mode='rgb')
     img = img.convert('RGB')
     st.write(uploaded_file)
     st.image(img, caption='Uploaded Image.', use_column_width=True)
@@ -20,10 +20,12 @@ if uploaded_file is not None:
     st.write("Classifying...")
 
     img = img.resize((150, 150))
-    input = keras.preprocessing.image.img_to_array(img)
+    input = img_to_array(img)
     input = np.expand_dims(input, axis=0)
     
     pred = model.predict(input)
+
+    st.write("Classified")
     
     if pred < 0.5:
         st.write('Tumor not found')
