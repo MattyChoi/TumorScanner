@@ -78,8 +78,9 @@ def augment(directory, num_samples, save_directory):
         rotation_range=15,
         width_shift_range=0.1,
         height_shift_range=0.1,
+        zoom_range=0.1,
         shear_range=0.1,
-        brightness_range=[0.1, 1.5],
+        brightness_range=[0.5, 1.5],
         horizontal_flip=True,
         vertical_flip=True
     )

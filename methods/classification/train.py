@@ -1,13 +1,18 @@
 import os
+import sys
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
+from keras.preprocessing.image import ImageDataGenerator
+from keras.callbacks import EarlyStopping,ModelCheckpoint
 
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
+sys.path.insert(1, os.path.join(os.getcwd(), 'models'))
 from cnn import *
+from vgg16 import *
+from trained_vgg16 import *
 from preprocess import *
 
-def train(model, BATCH_SIZE=32, EPOCHS=50, IMG_SIZE=(150,150)):
+def train(model, name, BATCH_SIZE=32, EPOCHS=50, IMG_SIZE=(150,150)):
     current = os.getcwd()
     dataset = os.path.join(current, "classify_data")
 
@@ -23,15 +28,14 @@ def train(model, BATCH_SIZE=32, EPOCHS=50, IMG_SIZE=(150,150)):
     # data augmentation for training set
     train_datagen = ImageDataGenerator(
         rescale = 1./255,
-        shear_range=0.1,
-        zoom_range=0.1,
-        horizontal_flip=True,
-        # vertical_flip=True,
         # rotation_range=15,
+        # zoom_range=0.1,
+        # shear_range=0.1,
+        # horizontal_flip=True,
+        # vertical_flip=True,
         # width_shift_range=0.1,
         # height_shift_range=0.1,
-        # shear_range=0.1,
-        # brightness_range=[0.5, 1.5]
+        # brightness_range=[0.5, 1.5],
     )
 
     # rescale validation testset
@@ -53,10 +57,26 @@ def train(model, BATCH_SIZE=32, EPOCHS=50, IMG_SIZE=(150,150)):
                                                 class_mode='binary',
                                                 color_mode='rgb')
 
+    # callbacks
+    # stop = EarlyStopping(
+    #     monitor='val_accuracy', 
+    #     mode='max',
+    #     patience=6
+    # )
+
+    # checkpoint= ModelCheckpoint(
+    #     filepath='./',
+    #     save_weights_only=True,
+    #     monitor='val_accuracy',
+    #     mode='max',
+    #     save_best_only=True
+    # )
+
     history = model.fit(
         train_data,
         epochs=EPOCHS,
-        validation_data=validation_data
+        validation_data=validation_data,
+        # callbacks=[stop,checkpoint]
     )
 
     # create a json file that lists the classification model contents
@@ -65,17 +85,18 @@ def train(model, BATCH_SIZE=32, EPOCHS=50, IMG_SIZE=(150,150)):
     #     json_file.write(model_json)
 
     # serialize weights to HDF5
-    model.save("cnn_model.h5")
+    model.save("../../trained_models/{}_model.h5".format(name))
     print("Saved model to disk")
 
 
 if __name__ == "__main__":
     # process the dataset
     undoPreprocess()
-    preprocess(num_augment_gen=0)
+    preprocess(num_augment_gen=30)
 
     # create the model
-    model = cnn()
-    
+    model = vgg16()
+    print(model.summary())
+
     # train the model
-    train(model, BATCH_SIZE=32, EPOCHS=50, IMG_SIZE=(150,150))
+    train(model, "vgg16", BATCH_SIZE=32, EPOCHS=100, IMG_SIZE=(224,224))
