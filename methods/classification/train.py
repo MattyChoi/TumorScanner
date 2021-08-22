@@ -29,21 +29,12 @@ def train(model, name, BATCH_SIZE=32, EPOCHS=50, IMG_SIZE=(150,150)):
     train_datagen = ImageDataGenerator(
         rescale = 1./255,
         # rotation_range=15,
-<<<<<<< HEAD
         # zoom_range=0.1,
         # shear_range=0.1,
         # horizontal_flip=True,
         # vertical_flip=True,
         # width_shift_range=0.1,
         # height_shift_range=0.1,
-=======
-        # width_shift_range=0.1,
-        # height_shift_range=0.1,
-        shear_range=0.1,
-        zoom_range=0.1,
-        horizontal_flip=True,
-        # vertical_flip=True,
->>>>>>> f50bda9b5ea9acd87be93f850b56146e3d28ff80
         # brightness_range=[0.5, 1.5],
     )
 
