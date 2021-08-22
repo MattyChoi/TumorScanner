@@ -12,7 +12,7 @@ from vgg16 import *
 from trained_vgg16 import *
 from preprocess import *
 
-def train(model, name, BATCH_SIZE=32, EPOCHS=50, IMG_SIZE=(150,150)):
+def train(model, name, BATCH_SIZE=32, EPOCHS=50, IMG_SIZE=(224,224)):
     current = os.getcwd()
     dataset = os.path.join(current, "classify_data")
 
@@ -28,11 +28,11 @@ def train(model, name, BATCH_SIZE=32, EPOCHS=50, IMG_SIZE=(150,150)):
     # data augmentation for training set
     train_datagen = ImageDataGenerator(
         rescale = 1./255,
-        # rotation_range=15,
-        # zoom_range=0.1,
-        # shear_range=0.1,
-        # horizontal_flip=True,
-        # vertical_flip=True,
+        rotation_range=15,
+        zoom_range=0.1,
+        shear_range=0.1,
+        horizontal_flip=True,
+        vertical_flip=True,
         # width_shift_range=0.1,
         # height_shift_range=0.1,
         # brightness_range=[0.5, 1.5],
@@ -99,4 +99,4 @@ if __name__ == "__main__":
     print(model.summary())
 
     # train the model
-    train(model, "vgg16", BATCH_SIZE=32, EPOCHS=100, IMG_SIZE=(224,224))
+    train(model, "vgg16", BATCH_SIZE=32, EPOCHS=50, IMG_SIZE=(224,224))

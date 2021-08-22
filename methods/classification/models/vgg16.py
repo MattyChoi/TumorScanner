@@ -61,17 +61,18 @@ def vgg16(input_shape=(224, 224, 3)):
 # did not use real time data augmentation and used saved augmented files
 
 # data augmentation for training set
-    # train_datagen = ImageDataGenerator(
-#         rescale = 1./255,
-#         # rotation_range=15,
-#         # width_shift_range=0.1,
-#         # height_shift_range=0.1,
-#         # shear_range=0.1,
-#         # zoom_range=0.1,
-#         # horizontal_flip=True,
-#         # vertical_flip=True,
-#         # brightness_range=[0.5, 1.5],
-#     )
+# train_datagen = ImageDataGenerator(
+#     rescale = 1./255,
+#     rotation_range=15,
+#     zoom_range=0.1,
+#     shear_range=0.1,
+#     horizontal_flip=True,
+#     vertical_flip=True,
+#     # width_shift_range=0.1,
+#     # height_shift_range=0.1,
+#     # brightness_range=[0.5, 1.5],
+# )
+
 
 # if __name__ == "__main__":
 #     # process the dataset
