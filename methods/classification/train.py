@@ -33,9 +33,9 @@ def train(model, name, BATCH_SIZE=32, EPOCHS=50, IMG_SIZE=(224,224)):
         shear_range=0.1,
         horizontal_flip=True,
         vertical_flip=True,
-        # width_shift_range=0.1,
-        # height_shift_range=0.1,
-        # brightness_range=[0.5, 1.5],
+        width_shift_range=0.1,
+        height_shift_range=0.1,
+        brightness_range=[0.5, 1.5],
     )
 
     # rescale validation testset
@@ -92,11 +92,11 @@ def train(model, name, BATCH_SIZE=32, EPOCHS=50, IMG_SIZE=(224,224)):
 if __name__ == "__main__":
     # process the dataset
     undoPreprocess()
-    preprocess(num_augment_gen=30)
+    preprocess(num_augment_gen=0)
 
     # create the model
     model = vgg16()
     print(model.summary())
 
     # train the model
-    train(model, "vgg16", BATCH_SIZE=32, EPOCHS=50, IMG_SIZE=(224,224))
+    train(model, "vgg16", BATCH_SIZE=32, EPOCHS=500, IMG_SIZE=(224,224))
