@@ -12,23 +12,23 @@ from nibabel import FileHolder, Nifti1Image, Nifti2Image
 
 # get functions from ./methods/segmentation/preprocess.py
 sys.path.insert(1, os.path.join(os.getcwd(), 'methods', 'segmentation'))
-from preprocess import *
+from gif_maker import *
 
 # create web application with user interface using streamlit
 st.title("Tumor Scanner")
 
-uploaded_file = st.file_uploader("Choose Brain Tumor File")
+uploaded_files = st.file_uploader("Choose Brain Tumor File", accept_multiple_files=True)
 
-if uploaded_file:
+if uploaded_files:
     # use classifier if file is jpeg
-    if uploaded_file.type == "image/jpeg":
+    if uploaded_files[0].type == "image/jpeg":
 
         # load the image and convert to rgb
-        img = Image.open(uploaded_file)
+        img = Image.open(uploaded_files[0])
         img = img.convert('RGB')
 
         # show the image
-        st.image(img, caption=uploaded_file.name, use_column_width=True)
+        st.image(img, caption=uploaded_files[0].name, use_column_width=True)
         
         # choose classifier model
         classify = os.path.join(os.getcwd(), "methods", "classification", "models")
@@ -58,28 +58,29 @@ if uploaded_file:
             st.write("Tumor detected")
 
     # use segmenter if file is nifti file
-    # elif uploaded_file.type == 'application/octet-stream':
+    # elif uploaded_file[0].type == 'application/octet-stream':
     else:
-        # hold the file
-        file = FileHolder(fileobj=uploaded_file)
+        for uploaded_file in uploaded_files:
+            # hold the file
+            file = FileHolder(fileobj=uploaded_file)
 
-        # read the file 
-        img = Nifti1Image.from_file_map({'header': file, 'image': file})
-        data = img.get_fdata()
+            # read the file 
+            img = Nifti1Image.from_file_map({'header': file, 'image': file})
+            data = img.get_fdata()
 
-        # put data in right shape
-        out_img, maximum = prepare_image(data, 1)
+            # put data in right shape
+            out_img, maximum = prepare_image(data, 1)
 
-        # create output mosaic
-        new_img = create_mosaic_normal(out_img, maximum)
-        
-        # create gif
-        gif = BytesIO()
-        gif.name = "temp.gif"
-        mimwrite(gif, new_img, format='gif', fps=int(18))
+            # create output mosaic
+            new_img = create_mosaic_normal(out_img, maximum)
+            
+            # create gif
+            gif = BytesIO()
+            gif.name = "temp.gif"
+            mimwrite(gif, new_img, format='gif', fps=int(18))
 
-        # show the image
-        st.image(gif, caption=uploaded_file.name, use_column_width=True)
+            # show the image
+            st.image(gif, caption=uploaded_file.name, use_column_width=True)
         
         # choose segmenter model
         segment = os.path.join(os.getcwd(), "methods", "segmentation", "models")

@@ -6,15 +6,16 @@ import keras.backend as K
 from tensorflow.keras.optimizers import Adam, RMSprop
 from keras.applications.vgg16 import VGG16
 from keras.models import Model
+from keras import Input
 from keras.layers import InputLayer, Conv2D, MaxPooling2D, Dropout, concatenate, Conv2DTranspose
 from tensorflow.keras.initializers import random_uniform, glorot_uniform, constant, identity, he_normal
 
 # use keras's functional api to build convolutional model for segmentation
-def unet_2D_model(input_size=(240, 240, 3), n_filters=32, n_classes=4):
+def unet_2D_model(input_shape=(224, 224, 2), n_filters=32, n_classes=4):
     # encode blocks have two outputs: first one is the output 
     # and the second is for skip connection
 
-    inputs = InputLayer(input_size)
+    inputs = Input(input_shape)
     encode1 = encode_block(inputs, n_filters)
     encode2 = encode_block(encode1[0], n_filters*2)
     encode3 = encode_block(encode2[0], n_filters*4)
@@ -104,17 +105,21 @@ def decode_block(expansive_input, contractive_input, n_filters):
 
     return conv
 
+
+
 # dice loss as defined above for 4 classes
 def dice_coef(y_true, y_pred, smooth=1.0):
     class_num = 4
-    total_loss = 0
     for i in range(class_num):
         y_true_f = K.flatten(y_true[:,:,:,i])
         y_pred_f = K.flatten(y_pred[:,:,:,i])
         intersection = K.sum(y_true_f * y_pred_f)
         loss = ((2. * intersection + smooth) / (K.sum(y_true_f) + K.sum(y_pred_f) + smooth))
    #     K.print_tensor(loss, message='loss value for class {} : '.format(SEGMENT_CLASSES[i]))
-        total_loss += loss
+        if i == 0:
+            total_loss = loss
+        else:
+            total_loss = total_loss + loss
     total_loss = total_loss / class_num
 #    K.print_tensor(total_loss, message=' total dice coef: ')
     return total_loss

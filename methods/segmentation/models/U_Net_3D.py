@@ -6,15 +6,16 @@ import keras.backend as K
 from tensorflow.keras.optimizers import Adam, RMSprop
 from keras.applications.vgg16 import VGG16
 from keras.models import Model
+from keras import Input
 from keras.layers import InputLayer, Conv3D, MaxPooling3D, Dropout, concatenate, Conv3DTranspose, BatchNormalization
 from tensorflow.keras.initializers import random_uniform, glorot_uniform, constant, identity, he_normal
 
 # use keras's functional api to build convolutional model for segmentation
-def unet_3D_model(input_size=(240, 240, 3), n_filters=32, n_classes=4):
+def unet_3D_model(input_shape=(224, 224, 3), n_filters=32, n_classes=4):
     # encode blocks have two outputs: first one is the output 
     # and the second is for skip connection
 
-    inputs = InputLayer(input_size)
+    inputs = Input(input_shape)
     encode1 = encode_block(inputs, n_filters)
     encode2 = encode_block(encode1[0], n_filters*2)
     encode3 = encode_block(encode2[0], n_filters*4)
