@@ -32,7 +32,7 @@ def unet_3D_model(input_shape=(224, 224, 3), n_filters=32, n_classes=4):
                     activation='relu',
                     padding='same', 
                     kernel_initializer=he_normal)(decode9)
-    outputs = Conv3D(n_classes, 1, padding='same')(conv)
+    outputs = Conv3D(n_classes, 1, activation = 'softmax')(conv)
 
     model = Model(inputs=inputs, outputs=outputs)
 

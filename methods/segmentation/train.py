@@ -26,7 +26,7 @@ from gif_maker import *
 # how to create custom data generator in link: https://stanford.edu/~shervine/blog/keras-how-to-generate-data-on-the-fly
 # tensorflow docs for keras.utils.Sequence: https://www.tensorflow.org/api_docs/python/tf/keras/utils/Sequence
 class DataGenerator(Sequence):
-    def __init__(self, data_ids, dim=(224, 224), batch_size = 1, n_channels = 2, shuffle=True):
+    def __init__(self, data_ids, dim=(128, 128), batch_size = 1, n_channels = 2, shuffle=True):
         self.dim = dim
         self.batch_size = batch_size
         self.data_ids = data_ids
@@ -76,23 +76,24 @@ class DataGenerator(Sequence):
             ce = nb.load(os.path.join(case_path, f'{id}_t1ce.nii')).get_fdata()
             # t1 = nb.load(os.path.join(case_path, f'{id}_t1.nii')).get_fdata()
             # t2 = nb.load(os.path.join(case_path, f'{id}_t2.nii')).get_fdata()
+
             seg = nb.load(os.path.join(case_path, f'{id}_seg.nii')).get_fdata()
-        
             for j in range(numVolumes):
                 X[j + numVolumes * c,:,:,0] = cv2.resize(flair[:,:,j + startVolume], self.dim)
                 X[j + numVolumes * c,:,:,1] = cv2.resize(ce[:,:,j + startVolume], self.dim)
                 # X[j + numVolumes * c,:,:,2] = cv2.resize(t1[:,:,j + startVolume], self.dim)
                 # X[j + numVolumes * c,:,:,3] = cv2.resize(t2[:,:,j + startVolume], self.dim)
                 y[j + numVolumes * c] = seg[:,:,j + startVolume]
-                    
+        X /= np.max(X)            
+
         # Generate masks
         y[y==4] = 3
         mask = tf.one_hot(y, 4)
-        Y = tf.image.resize(mask, self.dim)
-        return X / np.max(X), Y
+        y = tf.image.resize(mask, self.dim)
+        return X, y
 
 
-def train(model, name, BATCH_SIZE=32, EPOCHS=50, IMG_SIZE=(224,224), NUM_CHANNELS = 2):
+def train(model, name, BATCH_SIZE=32, EPOCHS=50, IMG_SIZE=(128,128), NUM_CHANNELS = 2):
     current = os.getcwd()
 
     # set constants
@@ -132,4 +133,4 @@ if __name__ == "__main__":
     print(model.summary())
 
     # train the model
-    train(model, "u_net_2D", BATCH_SIZE=1, EPOCHS=35, IMG_SIZE=input_shape, NUM_CHANNELS=n_channels)
+    train(model, "u_net_2D", BATCH_SIZE=2, EPOCHS=30, IMG_SIZE=input_shape, NUM_CHANNELS=n_channels)

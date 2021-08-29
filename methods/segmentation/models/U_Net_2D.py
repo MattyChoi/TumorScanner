@@ -11,7 +11,7 @@ from keras.layers import InputLayer, Conv2D, MaxPooling2D, Dropout, concatenate,
 from tensorflow.keras.initializers import random_uniform, glorot_uniform, constant, identity, he_normal
 
 # use keras's functional api to build convolutional model for segmentation
-def unet_2D_model(input_shape=(224, 224, 2), n_filters=32, n_classes=4):
+def unet_2D_model(input_shape=(128, 128, 2), n_filters=32, n_classes=4):
     # encode blocks have two outputs: first one is the output 
     # and the second is for skip connection
 
@@ -32,12 +32,12 @@ def unet_2D_model(input_shape=(224, 224, 2), n_filters=32, n_classes=4):
                     activation='relu',
                     padding='same', 
                     kernel_initializer=he_normal)(decode9)
-    outputs = Conv2D(n_classes, 1, padding='same')(conv)
+    outputs = Conv2D(n_classes, 1, activation = 'softmax')(conv)
 
     model = Model(inputs=inputs, outputs=outputs)
 
     model.compile(loss="categorical_crossentropy", 
-                optimizer=Adam(learning_rate=0.001), 
+                optimizer=Adam(learning_rate=1e-3), 
                 metrics = ['accuracy', 
                             tf.keras.metrics.MeanIoU(num_classes=4), 
                             dice_coef, 
@@ -106,7 +106,6 @@ def decode_block(expansive_input, contractive_input, n_filters):
     return conv
 
 
-
 # dice loss as defined above for 4 classes
 def dice_coef(y_true, y_pred, smooth=1.0):
     class_num = 4
@@ -115,13 +114,13 @@ def dice_coef(y_true, y_pred, smooth=1.0):
         y_pred_f = K.flatten(y_pred[:,:,:,i])
         intersection = K.sum(y_true_f * y_pred_f)
         loss = ((2. * intersection + smooth) / (K.sum(y_true_f) + K.sum(y_pred_f) + smooth))
-   #     K.print_tensor(loss, message='loss value for class {} : '.format(SEGMENT_CLASSES[i]))
+        # K.print_tensor(loss, message='loss value for class {} : '.format(SEGMENT_CLASSES[i]))
         if i == 0:
             total_loss = loss
         else:
             total_loss = total_loss + loss
     total_loss = total_loss / class_num
-#    K.print_tensor(total_loss, message=' total dice coef: ')
+    # K.print_tensor(total_loss, message=' total dice coef: ')
     return total_loss
 
 
