@@ -7,7 +7,7 @@ from tensorflow.keras.optimizers import Adam, RMSprop
 from keras.applications.vgg16 import VGG16
 from keras.models import Model
 from keras import Input
-from keras.layers import InputLayer, Conv2D, MaxPooling2D, Dropout, concatenate, Conv2DTranspose
+from keras.layers import InputLayer, Conv2D, MaxPooling2D, Dropout, concatenate, Conv2DTranspose, BatchNormalization
 from tensorflow.keras.initializers import random_uniform, glorot_uniform, constant, identity, he_normal
 
 # use keras's functional api to build convolutional model for segmentation
@@ -64,6 +64,7 @@ def encode_block(inputs, n_filters, dropout_prob=0, max_pooling=True):
                   activation="relu",
                   padding="same",
                   kernel_initializer=he_normal)(conv)
+    conv = BatchNormalization()(conv)
     
     # if dropout_prob > 0 add a dropout layer, with the variable dropout_prob as parameter
     if dropout_prob > 0:

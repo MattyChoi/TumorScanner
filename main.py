@@ -9,10 +9,14 @@ import os
 import sys
 import nibabel as nb
 from nibabel import FileHolder, Nifti1Image, Nifti2Image
+import tensorflow as tf
+import cv2
 
 # get functions from ./methods/segmentation/preprocess.py
 sys.path.insert(1, os.path.join(os.getcwd(), 'methods', 'segmentation'))
 from gif_maker import *
+sys.path.insert(1, os.path.join(os.getcwd(), 'methods', 'segmentation', 'models'))
+from u_net_2D import *
 
 # create web application with user interface using streamlit
 st.title("Tumor Scanner")
@@ -60,7 +64,13 @@ if uploaded_files:
     # use segmenter if file is nifti file
     # elif uploaded_file[0].type == 'application/octet-stream':
     else:
+        input = np.zeros((155, 128, 128, 2))
+        reqs = [0, 0]
+
         for uploaded_file in uploaded_files:
+            # get name
+            name = uploaded_file.name[uploaded_file.name.rfind('_') + 1:]
+
             # hold the file
             file = FileHolder(fileobj=uploaded_file)
 
@@ -81,15 +91,60 @@ if uploaded_files:
 
             # show the image
             st.image(gif, caption=uploaded_file.name, use_column_width=True)
-        
-        # choose segmenter model
-        segment = os.path.join(os.getcwd(), "methods", "segmentation", "models")
-        choices = np.array([choice[:-3] for choice in os.listdir(segment) if choice[-3:] == ".py"])
-        model_choice = st.selectbox("Choose model", choices, key='segment_models')
-        text = "Segmenting with " + model_choice + "..."
-        st.write(text)
 
-        # load model based on model choice
-        # model = load_model(os.path.join(os.getcwd(), "trained_models", model_choice + "_model.h5"))
-        
-        st.write("work in progress")
+            if name == "flair.nii":
+                for i in range(data.shape[2]):
+                    input[i,:,:,0] = cv2.resize(data[:,:,i], (128, 128))
+                reqs[0] += 1
+            elif name == "t1ce.nii":
+                for i in range(data.shape[2]):
+                    input[i,:,:,1] = cv2.resize(data[:,:,i], (128, 128))
+                reqs[1] += 1
+
+        if reqs != [1, 1]:
+            st.write("Need correct input files")
+        else:
+            # choose segmenter model
+            segment = os.path.join(os.getcwd(), "methods", "segmentation", "models")
+            choices = np.array([choice[:-3] for choice in os.listdir(segment) if choice[-3:] == ".py"])
+            model_choice = st.selectbox("Choose model", choices, key='segment_models')
+            text = "Segmenting with " + model_choice + "..."
+            st.write(text)
+
+            # load model based on model choice
+            model = load_model(os.path.join(os.getcwd(), "trained_models", model_choice + "_model.h5"), 
+                                custom_objects = { 'accuracy' : tf.keras.metrics.MeanIoU(num_classes=4),
+                                                    "dice_coef": dice_coef,
+                                                    "precision": precision,
+                                                    "sensitivity": sensitivity,
+                                                    "specificity": specificity,
+                                                    "dice_coef_necrotic": dice_coef_necrotic,
+                                                    "dice_coef_edema": dice_coef_edema,
+                                                    "dice_coef_enhancing": dice_coef_enhancing}, 
+                                compile=False
+            )
+            
+            pred = model.predict(input/np.max(input))
+
+            # fetch the most likely labels
+            pred = tf.argmax(pred, axis=-1)
+            img = np.zeros((pred.shape[1], pred.shape[2], pred.shape[0]))
+            for i in range(pred.shape[0]):
+                img[:,:,i] = pred[i,:,:]
+
+            # put data in right shape
+            out_img, maximum = prepare_image(img, 1)
+
+            # create output mosaic
+            new_img = create_mosaic_normal(out_img, maximum)
+            
+            # create gif
+            pred_gif = BytesIO()
+            pred_gif.name = "pred.gif"
+            mimwrite(pred_gif, new_img, format='gif', fps=int(18))
+
+            # show the image
+            st.image(pred_gif, caption=pred_gif.name, use_column_width=True)
+
+            text = "Classified with " + model_choice
+            st.write(text)
