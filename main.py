@@ -131,7 +131,8 @@ if uploaded_files:
             img = np.zeros((pred.shape[1], pred.shape[2], pred.shape[0]))
             for i in range(pred.shape[0]):
                 img[:,:,i] = pred[i,:,:]
-
+            # img = tf.image.resize(img, (240, 240))
+            
             # put data in right shape
             out_img, maximum = prepare_image(img, 1)
 
@@ -143,8 +144,8 @@ if uploaded_files:
             pred_gif.name = "pred.gif"
             mimwrite(pred_gif, new_img, format='gif', fps=int(18))
 
+            text = "Segmented with " + model_choice
+            st.write(text)
+
             # show the image
             st.image(pred_gif, caption=pred_gif.name, use_column_width=True)
-
-            text = "Classified with " + model_choice
-            st.write(text)

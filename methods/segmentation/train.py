@@ -126,11 +126,14 @@ def train(model, name, BATCH_SIZE=32, EPOCHS=50, IMG_SIZE=(128,128), NUM_CHANNEL
     
 
 if __name__ == "__main__":
-    input_shape = (128, 128)
+    print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
+    
+    input_shape = (240, 240)
     n_channels = 2
+
     # create the model
     model = unet_2D_model(input_shape=(*input_shape, n_channels))
-    print(model.summary())
+    # print(model.summary())
 
     # train the model
-    train(model, "u_net_2D", BATCH_SIZE=2, EPOCHS=30, IMG_SIZE=input_shape, NUM_CHANNELS=n_channels)
+    train(model, "u_net_2D", BATCH_SIZE=16, EPOCHS=30, IMG_SIZE=input_shape, NUM_CHANNELS=n_channels)
