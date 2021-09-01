@@ -59,6 +59,7 @@ def encode_block(inputs, n_filters, dropout_prob=0, max_pooling=True):
                   activation="relu",
                   padding="same",
                   kernel_initializer=he_normal)(inputs)
+    conv = BatchNormalization()(conv)
     conv = Conv2D(n_filters, # Number of filters
                   3,   # Kernel size
                   activation="relu",
