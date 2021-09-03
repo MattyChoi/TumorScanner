@@ -11,7 +11,7 @@ from keras.layers import InputLayer, Conv2D, MaxPooling2D, Dropout, concatenate,
 from tensorflow.keras.initializers import random_uniform, glorot_uniform, constant, identity, he_normal
 
 # use keras's functional api to build convolutional model for segmentation
-def unet_2D_model(input_shape=(128, 128, 2), n_filters=32, n_classes=4):
+def unet_2D_model(input_shape=(240, 240, 2), n_filters=32, n_classes=4):
     # encode blocks have two outputs: first one is the output 
     # and the second is for skip connection
 

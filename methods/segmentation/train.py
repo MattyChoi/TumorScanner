@@ -26,7 +26,7 @@ from gif_maker import *
 # how to create custom data generator in link: https://stanford.edu/~shervine/blog/keras-how-to-generate-data-on-the-fly
 # tensorflow docs for keras.utils.Sequence: https://www.tensorflow.org/api_docs/python/tf/keras/utils/Sequence
 class DataGenerator(Sequence):
-    def __init__(self, data_ids, dim=(128, 128), batch_size = 1, n_channels = 2, shuffle=True):
+    def __init__(self, data_ids, dim=(240, 240), batch_size = 1, n_channels = 2, shuffle=True):
         self.dim = dim
         self.batch_size = batch_size
         self.data_ids = data_ids
