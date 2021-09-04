@@ -136,4 +136,4 @@ if __name__ == "__main__":
     # print(model.summary())
 
     # train the model
-    train(model, "u_net_2D", BATCH_SIZE=1, EPOCHS=30, IMG_SIZE=input_shape, NUM_CHANNELS=n_channels)
+    train(model, "u_net_2D", BATCH_SIZE=1, EPOCHS=50, IMG_SIZE=input_shape, NUM_CHANNELS=n_channels)

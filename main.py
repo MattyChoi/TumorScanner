@@ -135,7 +135,8 @@ if uploaded_files:
 
             # fetch the most likely labels
             pred = tf.argmax(pred, axis=-1)
-            pred[pred==3] = 4
+            # pred[pred==3] = 4
+            pred = tf.where(pred==3, 4, pred)
             img = np.zeros((pred.shape[1], pred.shape[2], pred.shape[0]))
             for i in range(pred.shape[0]):
                 img[:,:,i] = pred[i,:,:]
