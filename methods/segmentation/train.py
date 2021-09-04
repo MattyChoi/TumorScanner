@@ -93,7 +93,7 @@ class DataGenerator(Sequence):
         return X, y
 
 
-def train(model, name, BATCH_SIZE=32, EPOCHS=50, IMG_SIZE=(128,128), NUM_CHANNELS = 2):
+def train(model, name, BATCH_SIZE=32, EPOCHS=50, IMG_SIZE=(240,240), NUM_CHANNELS = 2):
     current = os.getcwd()
 
     # set constants
@@ -128,7 +128,7 @@ def train(model, name, BATCH_SIZE=32, EPOCHS=50, IMG_SIZE=(128,128), NUM_CHANNEL
 if __name__ == "__main__":
     print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
     
-    input_shape = (240, 240)
+    input_shape = (144, 144)
     n_channels = 2
 
     # create the model

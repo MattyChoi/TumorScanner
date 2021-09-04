@@ -64,7 +64,8 @@ if uploaded_files:
     # use segmenter if file is nifti file
     # elif uploaded_file[0].type == 'application/octet-stream':
     else:
-        input = np.zeros((155, 128, 128, 2))
+        dim = (144, 144)
+        input = np.zeros((155, *dim, 2))
         reqs = [0, 0]
 
         for uploaded_file in uploaded_files:
@@ -94,11 +95,11 @@ if uploaded_files:
 
             if name == "flair.nii":
                 for i in range(data.shape[2]):
-                    input[i,:,:,0] = cv2.resize(data[:,:,i], (128, 128))
+                    input[i,:,:,0] = cv2.resize(data[:,:,i], dim)
                 reqs[0] += 1
             elif name == "t1ce.nii":
                 for i in range(data.shape[2]):
-                    input[i,:,:,1] = cv2.resize(data[:,:,i], (128, 128))
+                    input[i,:,:,1] = cv2.resize(data[:,:,i], dim)
                 reqs[1] += 1
 
         if reqs != [1, 1]:
@@ -131,7 +132,10 @@ if uploaded_files:
             img = np.zeros((pred.shape[1], pred.shape[2], pred.shape[0]))
             for i in range(pred.shape[0]):
                 img[:,:,i] = pred[i,:,:]
-            # img = tf.image.resize(img, (240, 240))
+
+            # resize prediction to match the format of the original files
+            # lossy because resizing from a smaller fram to a bigger frame
+            img = tf.image.resize(img, (240, 240))
             
             # put data in right shape
             out_img, maximum = prepare_image(img, 1)
