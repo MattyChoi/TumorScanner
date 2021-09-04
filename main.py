@@ -18,6 +18,13 @@ from gif_maker import *
 sys.path.insert(1, os.path.join(os.getcwd(), 'methods', 'segmentation', 'models'))
 from u_net_2D import *
 
+# checks if uploaded files are all nifti files
+def checkNifti(images):
+    for image in images:
+        if image.type != "application/octet-stream":
+            return False
+    return True
+
 # create web application with user interface using streamlit
 st.title("Tumor Scanner")
 
@@ -25,7 +32,7 @@ uploaded_files = st.file_uploader("Choose Brain Tumor File", accept_multiple_fil
 
 if uploaded_files:
     # use classifier if file is jpeg
-    if uploaded_files[0].type == "image/jpeg":
+    if len(uploaded_files) == 1 and uploaded_files[0].type == "image/jpeg":
 
         # load the image and convert to rgb
         img = Image.open(uploaded_files[0])
@@ -62,8 +69,7 @@ if uploaded_files:
             st.write("Tumor detected")
 
     # use segmenter if file is nifti file
-    # elif uploaded_file[0].type == 'application/octet-stream':
-    else:
+    elif len(uploaded_files) > 1 and checkNifti(uploaded_files):
         dim = (144, 144)
         input = np.zeros((155, *dim, 2))
         reqs = [0, 0]
@@ -129,6 +135,7 @@ if uploaded_files:
 
             # fetch the most likely labels
             pred = tf.argmax(pred, axis=-1)
+            pred[pred==3] = 4
             img = np.zeros((pred.shape[1], pred.shape[2], pred.shape[0]))
             for i in range(pred.shape[0]):
                 img[:,:,i] = pred[i,:,:]
@@ -153,3 +160,5 @@ if uploaded_files:
 
             # show the image
             st.image(pred_gif, caption=pred_gif.name, use_column_width=True)
+    else:
+        st.write("Incorrect file formats")
